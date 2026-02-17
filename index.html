@@ -1,54 +1,98 @@
 <!DOCTYPE html>
 <html lang="et">
 <head>
-    <meta http-equiv="refresh" content="10">
-    <meta charset="UTF-8">
-    <title>Minu Restorani Menüü</title>
-    <style>
-        body { font-family: 'Georgia', serif; background-color: #fdfaf6; color: #333; text-align: center; padding: 50px; }
-        .menu-container { max-width: 600px; margin: 0 auto; border: 2px solid #d4af37; padding: 30px; border-radius: 15px; background: white; }
-        h1 { color: #d4af37; text-transform: uppercase; letter-spacing: 2px; }
-        .item { display: flex; justify-content: space-between; border-bottom: 1px dotted #ccc; margin-bottom: 15px; padding-bottom: 5px; }
-        .price { font-weight: bold; color: #b22222; }
-        .loading { font-style: italic; color: gray; }
-    </style>
+<meta charset="UTF-8">
+<title>Minu Restorani Menüü</title>
+
+<style>
+body { 
+    font-family: 'Georgia', serif; 
+    background-color: #fdfaf6; 
+    color: #333; 
+    text-align: center; 
+    padding: 50px; 
+}
+
+.menu-container { 
+    max-width: 600px; 
+    margin: 0 auto; 
+    border: 2px solid #d4af37; 
+    padding: 30px; 
+    border-radius: 15px; 
+    background: white; 
+}
+
+.item { 
+    display: flex; 
+    justify-content: space-between; 
+    margin: 10px 0; 
+    font-size: 18px; 
+}
+
+.price {
+    font-weight: bold;
+    color: #d4af37;
+}
+
+.loading {
+    font-style: italic;
+    color: gray;
+}
+</style>
 </head>
+
 <body>
 
-    <div class="menu-container">
-        <h1>Päevamenüü</h1>
-        <div id="menu-items">
-            <p class="loading">Laen maitsvaid roogasid...</p>
-        </div>
+<div class="menu-container">
+    <h1>Päevamenüü</h1>
+    <div id="menu-items">
+        <p class="loading">Laen maitsvaid roogasid...</p>
     </div>
+</div>
 
-    <script>
-        // ASENDA SEE OMA URL-IGA!
-        const API_URL = "https://script.google.com/macros/s/AKfycbxLTSa_dm889Lj_IH6hd2sbuCvBpwJNiSw9IwDPQgH2wozW2NCANkpjv8iESOoTFsxt7w/exec";
+<script>
 
-        async function laeMenyy() {
-            try {
-                const response = await fetch(API_URL, { redirect: 'follow' });;
-                const andmed = await response.json();
-                
-                let html = "";
-                andmed.forEach(toit => {
-                    html += `
-                        <div class="item">
-                            <span>${toit.nimi}</span>
-                            <span class="price">${toit.hind} €</span>
-                        </div>
-                    `;
-                });
-                
-                document.getElementById('menu-items').innerHTML = html;
-            } catch (viga) {
-                document.getElementById('menu-items').innerHTML = "Viga menüü laadimisel. Palun proovi uuesti.";
-                console.error(viga);
-            }
-        }
+// Näidis API URL (asenda oma backendiga)
+const API_URL = "menu.json"; 
+// Kui sul on päris server, pane näiteks:
+// const API_URL = "https://sinu-server.ee/api/menu";
 
-        laeMenyy();
-    </script>
+async function laeMenyy() {
+    try {
+        const response = await fetch(API_URL + "?t=" + new Date().getTime()); 
+        // "?t=" lisab cache-bypass, et brauser ei kasutaks vana versiooni
+
+        const andmed = await response.json();
+
+        let html = "";
+
+        andmed.forEach(toit => {
+            html += `
+                <div class="item">
+                    <span>${toit.nimi}</span>
+                    <span class="price">${toit.hind} €</span>
+                </div>
+            `;
+        });
+
+        document.getElementById("menu-items").innerHTML = html;
+
+    } catch (viga) {
+        document.getElementById("menu-items").innerHTML = 
+            "Viga menüü laadimisel. Palun proovi uuesti.";
+        console.error(viga);
+    }
+}
+
+// Lae kohe lehe avamisel
+laeMenyy();
+
+// Uuenda iga 10 sekundi tagant
+setInterval(() => {
+    laeMenyy();
+}, 10000);
+
+</script>
+
 </body>
 </html>
