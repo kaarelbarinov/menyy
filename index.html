@@ -1,98 +1,82 @@
 <!DOCTYPE html>
 <html lang="et">
 <head>
-<meta charset="UTF-8">
-<title>Minu Restorani Menüü</title>
+    <meta charset="UTF-8">
+    <title>Demo App</title>
 
-<style>
-body { 
-    font-family: 'Georgia', serif; 
-    background-color: #fdfaf6; 
-    color: #333; 
-    text-align: center; 
-    padding: 50px; 
-}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+        }
 
-.menu-container { 
-    max-width: 600px; 
-    margin: 0 auto; 
-    border: 2px solid #d4af37; 
-    padding: 30px; 
-    border-radius: 15px; 
-    background: white; 
-}
+        h1 {
+            color: #333;
+        }
 
-.item { 
-    display: flex; 
-    justify-content: space-between; 
-    margin: 10px 0; 
-    font-size: 18px; 
-}
+        .menu {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
-.price {
-    font-weight: bold;
-    color: #d4af37;
-}
+        .status {
+            background: #222;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
 
-.loading {
-    font-style: italic;
-    color: gray;
-}
-</style>
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="menu-container">
-    <h1>Päevamenüü</h1>
-    <div id="menu-items">
-        <p class="loading">Laen maitsvaid roogasid...</p>
+    <h1>Minu Demo Äpp</h1>
+
+    <div class="menu">
+        <button onclick="changePage('Avaleht')">Avaleht</button>
+        <button onclick="changePage('Seaded')">Seaded</button>
+        <button onclick="changePage('Info')">Info</button>
     </div>
-</div>
 
-<script>
+    <div id="content">
+        <h2>Avaleht</h2>
+        <p>Tere tulemast!</p>
+    </div>
 
-// Näidis API URL (asenda oma backendiga)
-const API_URL = "menu.json"; 
-// Kui sul on päris server, pane näiteks:
-// const API_URL = "https://sinu-server.ee/api/menu";
+    <div class="status" id="status">
+        Laen...
+    </div>
 
-async function laeMenyy() {
-    try {
-        const response = await fetch(API_URL + "?t=" + new Date().getTime()); 
-        // "?t=" lisab cache-bypass, et brauser ei kasutaks vana versiooni
+    <script>
+        // Lehe vahetamine
+        function changePage(page) {
+            const content = document.getElementById("content");
 
-        const andmed = await response.json();
-
-        let html = "";
-
-        andmed.forEach(toit => {
-            html += `
-                <div class="item">
-                    <span>${toit.nimi}</span>
-                    <span class="price">${toit.hind} €</span>
-                </div>
+            content.innerHTML = `
+                <h2>${page}</h2>
+                <p>Sa oled lehel: ${page}</p>
             `;
-        });
+        }
 
-        document.getElementById("menu-items").innerHTML = html;
+        // Automaatne värskendus iga 2 sekundi tagant
+        setInterval(function() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
 
-    } catch (viga) {
-        document.getElementById("menu-items").innerHTML = 
-            "Viga menüü laadimisel. Palun proovi uuesti.";
-        console.error(viga);
-    }
-}
-
-// Lae kohe lehe avamisel
-laeMenyy();
-
-// Uuenda iga 10 sekundi tagant
-setInterval(() => {
-    laeMenyy();
-}, 10000);
-
-</script>
+            document.getElementById("status").innerText =
+                "Viimane värskendus: " + timeString;
+        }, 2000);
+    </script>
 
 </body>
 </html>
